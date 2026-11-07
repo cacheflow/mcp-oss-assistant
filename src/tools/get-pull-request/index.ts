@@ -1,17 +1,14 @@
 import type { CallToolResult } from "@modelcontextprotocol/server";
 import { z } from 'zod';
-import { Octokit } from 'octokit';
+import type { ToolHandler, ToolInput } from "../types.js";
 
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN
-})
+const inputSchema = z.object({
+  owner: z.string().describe("Owner of the repository"),
+  repo: z.string().describe("Repository name"),
+  pull_number: z.number().describe("Pull request number"),
+});
 
-const getPullRequestHandler = async ({ client, owner, repo, pull_number }: {
-  client: Octokit,
-  owner: string,
-  repo: string,
-  pull_number: number
-}): Promise<CallToolResult> => {
+const getPullRequestHandler = async ({ client, owner, repo, pull_number }: ToolInput<typeof inputSchema>): Promise<CallToolResult> => {
     try {
       const response = await client.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
       owner,
@@ -69,10 +66,6 @@ const getPullRequestHandler = async ({ client, owner, repo, pull_number }: {
 export const getPullRequestTool = {
   name: "get_pull_request",
   description: "Get a pull request from GitHub",
-  schema:  z.object({
-    owner: z.string().describe("Owner of the repository"),
-    repo: z.string().describe("Repository name"),
-    pull_number: z.number().describe("Pull request number"),
-  }),
+  schema: inputSchema,
   handler: getPullRequestHandler
-}
+} satisfies ToolHandler<typeof inputSchema>;
