@@ -64,11 +64,11 @@ It waits for MCP messages on stdin; it does not start an HTTP server or an inter
 
 Fetches one GitHub pull request by repository owner, repository name, and pull request number.
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `owner` | `string` | GitHub user or organization that owns the repository |
-| `repo` | `string` | Repository name |
-| `pull_number` | `number` | Pull request number |
+| Argument      | Type     | Description                                          |
+| ------------- | -------- | ---------------------------------------------------- |
+| `owner`       | `string` | GitHub user or organization that owns the repository |
+| `repo`        | `string` | Repository name                                      |
+| `pull_number` | `number` | Pull request number                                  |
 
 Example tool arguments:
 

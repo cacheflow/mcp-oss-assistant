@@ -1,8 +1,8 @@
-import { serveStdio } from '@modelcontextprotocol/server/stdio';
-import { createServer } from './server.js'
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import { createServer } from "./server.js";
 
 serveStdio(createServer, {
-    onerror: (error) => console.error("Weather MCP Server error:", error),
+  onerror: (error) => console.error("Weather MCP Server error:", error),
 });
 
-console.error(`Weather MCP Server running on stdio`);
+console.error(`Weather MC    Server running on stdio`);

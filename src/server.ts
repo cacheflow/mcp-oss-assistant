@@ -1,19 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/server";
-import { Octokit } from 'octokit';
-import { tools } from './tools/index.js';
+import { Octokit } from "octokit";
+import { tools } from "./tools/index.js";
 
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN
-}) 
-export function createServer() {
-  const server = new McpServer({name: 'my-server', version: '1.0.0'})
+  auth: process.env.GITHUB_TOKEN,
+});
 
-  const {
-    getPullRequest,
-    getChangedFiles,
-    getChecks
-  } = tools;
-  
+export function createServer() {
+  const server = new McpServer({ name: "my-server", version: "1.0.0" });
+
+  const { getPullRequest, getChangedFiles, getChecks } = tools;
+
   server.registerTool(
     getPullRequest.name,
     {
@@ -21,8 +18,13 @@ export function createServer() {
       inputSchema: getPullRequest.schema,
     },
     async ({ owner, repo, pull_number }) => {
-      return getPullRequest.handler({ client: octokit, owner, repo, pull_number });
-    }
+      return getPullRequest.handler({
+        client: octokit,
+        owner,
+        repo,
+        pull_number,
+      });
+    },
   );
 
   server.registerTool(
@@ -32,8 +34,13 @@ export function createServer() {
       inputSchema: getChangedFiles.schema,
     },
     async ({ owner, repo, pull_number }) => {
-      return getChangedFiles.handler({ client: octokit, owner, repo, pull_number });
-    }
+      return getChangedFiles.handler({
+        client: octokit,
+        owner,
+        repo,
+        pull_number,
+      });
+    },
   );
 
   server.registerTool(
@@ -44,8 +51,8 @@ export function createServer() {
     },
     async ({ owner, repo, pull_number }) => {
       return getChecks.handler({ client: octokit, owner, repo, pull_number });
-    }
+    },
   );
 
-  return server
+  return server;
 }

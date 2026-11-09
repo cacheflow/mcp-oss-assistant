@@ -1,5 +1,5 @@
 import type { CallToolResult } from "@modelcontextprotocol/server";
-import { z } from 'zod';
+import { z } from "zod";
 import type { ToolHandler, ToolInput } from "../types.js";
 
 const inputSchema = z.object({
@@ -8,24 +8,29 @@ const inputSchema = z.object({
   pull_number: z.number().describe("Pull request number"),
 });
 
-const getPullRequestHandler = async ({ client, owner, repo, pull_number }: ToolInput<typeof inputSchema>): Promise<CallToolResult> => {
-    try {
-      const response = await client.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+const getPullRequestHandler = async ({
+  client,
+  owner,
+  repo,
+  pull_number,
+}: ToolInput<typeof inputSchema>): Promise<CallToolResult> => {
+  try {
+    const response = await client.request("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
       owner,
       repo,
       pull_number: Number(pull_number),
       headers: {
-        'X-GitHub-Api-Version': '2026-03-10'
-      }
+        "X-GitHub-Api-Version": "2026-03-10",
+      },
     });
 
     if (!response) {
       return {
         content: [
-            {
+          {
             type: "text",
             text: "Failed to retrieve pull request data",
-            },
+          },
         ],
       };
     }
@@ -35,23 +40,23 @@ const getPullRequestHandler = async ({ client, owner, repo, pull_number }: ToolI
     if (!Object.keys(features).length) {
       return {
         content: [
-            {
+          {
             type: "text",
             text: `No active pull requests for ${owner}/${repo} #${pull_number}`,
-            },
+          },
         ],
       };
     }
 
     return {
-        content: [
+      content: [
         {
           type: "text",
           text: JSON.stringify(features, null, 2),
         },
-        ],
+      ],
     };
-    } catch (error) {
+  } catch (error) {
     return {
       content: [
         {
@@ -60,12 +65,12 @@ const getPullRequestHandler = async ({ client, owner, repo, pull_number }: ToolI
         },
       ],
     };
-    }
-}
+  }
+};
 
 export const getPullRequestTool = {
   name: "get_pull_request",
   description: "Get a pull request from GitHub",
   schema: inputSchema,
-  handler: getPullRequestHandler
+  handler: getPullRequestHandler,
 } satisfies ToolHandler<typeof inputSchema>;
