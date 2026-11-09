@@ -9,19 +9,32 @@
   "bin": {
     "oss": "./build/index.js"
   },
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format:check": "prettier --check .",
+    "version": "node scripts/sync-server-json.mjs && node scripts/promote-changelog.mjs && git add server.json CHANGELOG.md",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "format": "prettier --write src/**/*.ts",
+    "lint": "eslint src scripts",
+    "lint:fix": "eslint src scripts --fix",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "test:precommit": "npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
     "@modelcontextprotocol/server": "^2.4.0",
     "octokit": "^5.0.5",
+    "vitest": "^3.1.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "prettier": "3.9.10",
     "typescript": "^7.0.2"
   }
 }

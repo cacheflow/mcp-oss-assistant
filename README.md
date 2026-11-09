@@ -64,11 +64,11 @@ It waits for MCP messages on stdin; it does not start an HTTP server or an inter
 
 Fetches one GitHub pull request by repository owner, repository name, and pull request number.
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `owner` | `string` | GitHub user or organization that owns the repository |
-| `repo` | `string` | Repository name |
-| `pull_number` | `number` | Pull request number |
+| Argument      | Type     | Description                                          |
+| ------------- | -------- | ---------------------------------------------------- |
+| `owner`       | `string` | GitHub user or organization that owns the repository |
+| `repo`        | `string` | Repository name                                      |
+| `pull_number` | `number` | Pull request number                                  |
 
 Example tool arguments:
 
@@ -98,7 +98,33 @@ npm run build
 npx tsc --noEmit
 ```
 
-There is no automated test suite yet; `npm test` is currently a placeholder that exits with an error.
+### Tests
+
+Run the automated suite:
+
+```sh
+npm test
+```
+
+This builds the TypeScript project and runs `node --test tests/*.test.mjs`. The tests use Node's built-in test runner (`node:test`), not Vitest. Although Vitest is currently installed, running these files with it produces `No test suite found`.
+
+```sh
+# Run the same checks used by the precommit test script
+npm run test:precommit
+
+# Watch tests after compiling the application
+npm run build
+node --test --watch tests/*.test.mjs
+```
+
+The tests import compiled files from `build/`. Rebuild after changing TypeScript source; when developing in watch mode, run `npm run watch` in a separate terminal.
+
+- `tests/tools.test.mjs` checks tool output, GitHub error handling, input schemas, endpoint selection for pull requests and changed files, and empty changed-file results.
+- `tests/server.test.mjs` launches the compiled server over STDIO, discovers all three tools, and checks that missing arguments are rejected. It exercises legacy MCP client compatibility.
+
+GitHub requests in handler tests are mocked. The STDIO test uses discovery and invalid inputs only, so the suite requires no GitHub token or live network requests. It does not verify live GitHub authentication or API compatibility.
+
+Two `test.todo` entries track checks-endpoint behavior and changed-files cursor pagination. TODOs are reminders, not passing coverage or test failures.
 
 ### Project structure
 
@@ -109,7 +135,10 @@ src/
   tools/
     get-pull-request/
       index.ts                   # Input schema and GitHub request handler
-      types.ts                   # Placeholder for tool types
+    types.ts                     # Shared tool handler types
+tests/
+  tools.test.mjs                 # Handler and schema tests
+  server.test.mjs                # STDIO integration test
 tsconfig.json                   # TypeScript compiler configuration
 ```
 
@@ -117,6 +146,7 @@ To add a tool, define its input schema and handler under `src/tools/`, then regi
 
 ## Troubleshooting
 
+- **Tests report “No test suite found”:** Run `npm test`, which uses Node's test runner. Do not run these `node:test` files with Vitest.
 - **The client cannot launch the server:** Confirm that Node.js is available, run `npm run build`, and check the absolute path to `build/index.js`.
 - **GitHub requests fail:** Confirm that the server process receives `GITHUB_TOKEN`, that the token can access the repository, and that the owner, repository name, and pull request number are correct. Inspect the returned error for details.
 - **Changes are not taking effect:** Rebuild and restart the server through your MCP client.

@@ -3,13 +3,13 @@ export const toError = (err: unknown): Error => {
     return err;
   }
 
-  if (typeof err === 'string') {
+  if (typeof err === "string") {
     return new Error(err);
   }
 
-  if (typeof err === 'object' && err !== null) {
+  if (typeof err === "object" && err !== null) {
     return new Error(JSON.stringify(err));
   }
 
-  return new Error('Unknown error occurred');
+  return new Error("Unknown error occurred");
 };
